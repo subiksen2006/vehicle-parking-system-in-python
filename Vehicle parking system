@@ -1,0 +1,172 @@
+# Author: Subiksen V S
+# Project: Parking Lot Management System
+# Description: This program simulates a parking lot management system where users can park vehicles,
+# vacate spots, check available and occupied spaces, and display the parking map.
+
+import random
+import time
+from collections import OrderedDict
+
+# ParkingLot class to manage the parking lot operations
+class ParkingLot:
+    def __init__(self, capacity):
+        """
+        Initializes the ParkingLot with a specified capacity.
+        Creates an OrderedDict to keep track of parking spots.
+        """
+        self.capacity = capacity
+        # Initialize spots as an OrderedDict with all spots empty (None)
+        self.spots = OrderedDict((i, None) for i in range(1, capacity + 1))
+        self.available_spots = capacity   # Tracks the number of available spots
+        self.occupied_spots = 0           # Tracks the number of occupied spots
+
+    def park_vehicle(self, vehicle_id, spot):
+        """
+        Parks a vehicle in a specified spot if it's available.
+        """
+        if spot in self.spots and self.spots[spot] is None:
+            self.spots[spot] = vehicle_id  # Assign vehicle ID to the spot
+            self.available_spots -= 1      # Decrease the available spots count
+            self.occupied_spots += 1       # Increase the occupied spots count
+            print(f"Vehicle {vehicle_id} parked at spot {spot}.")
+        else:
+            print(f"Spot {spot} is already occupied or invalid.")
+
+    def vacate_spot(self, spot):
+        """
+        Vacates a specified parking spot if it's occupied.
+        """
+        if spot in self.spots and self.spots[spot] is not None:
+            vehicle_id = self.spots[spot]  # Get the vehicle ID of the parked car
+            self.spots[spot] = None        # Vacate the spot
+            self.available_spots += 1      # Increase the available spots count
+            self.occupied_spots -= 1       # Decrease the occupied spots count
+            print(f"Spot {spot} vacated. Vehicle {vehicle_id} removed.")
+        else:
+            print(f"Spot {spot} is already vacant or invalid.")
+
+    def find_available_spot(self):
+        """
+        Finds the first available spot in the parking lot.
+        Returns the spot number if available, otherwise None.
+        """
+        for spot, vehicle in self.spots.items():
+            if vehicle is None:
+                return spot
+        return None
+
+    def calculate_distance_to_spot(self, spot):
+        """
+        Calculates the distance from the entrance (spot 1) to the given spot.
+        Assumes each spot is 10 units apart.
+        """
+        entrance_spot = 1
+        return abs(spot - entrance_spot) * 10  # Distance calculation
+
+    def display_parking_map(self):
+        """
+        Displays a map of the parking lot showing which spots are occupied or available.
+        """
+        print("Parking Lot Map:")
+        for spot, vehicle in self.spots.items():
+            if vehicle is None:
+                print(f"Spot {spot}: available")
+            else:
+                print(f"Spot {spot}: occupied by Vehicle {vehicle}") 
+
+    def available_spaces(self):
+        """
+        Returns the count of available parking spaces.
+        """
+        return self.available_spots
+
+    def occupied_spaces(self):
+        """
+        Returns the count of occupied parking spaces.
+        """
+        return self.occupied_spots
+
+
+def main():
+    """
+    Main function to run the Parking Lot Management System.
+    """
+    try:
+        # Input for total parking lot capacity
+        capacity = int(input("Enter parking lot capacity: "))
+    except ValueError:
+        print("Invalid input. Please enter a valid number.")
+        return
+
+    # Create an instance of ParkingLot with the given capacity
+    parking_lot = ParkingLot(capacity)
+
+    # Infinite loop to interact with the user until they choose to exit
+    while True:
+        # Display menu options
+        print("\n1. Park Vehicle")
+        print("2. Vacate Parking Spot")
+        print("3. Check Available Parking Spaces")
+        print("4. Check Occupied Parking Spaces")
+        print("5. Display Parking Map")
+        print("6. Exit")
+        
+        # Take user input for menu choice
+        try:
+            choice = int(input("Enter your choice: "))
+        except ValueError:
+            print("Invalid choice. Please enter a number between 1 and 6.")
+            continue
+
+        # Handling user choices based on the input
+        if choice == 1:
+            vehicle_id = str(random.randint(1000, 9999))  # Randomly generate a vehicle ID
+            try:
+                spot = int(input(f"Enter spot number to park (1 to {capacity}): "))
+            except ValueError:
+                print("Invalid input. Please enter a valid spot number.")
+                continue
+            
+            # Park the vehicle if the spot number is valid
+            if 1 <= spot <= capacity:
+                parking_lot.park_vehicle(vehicle_id, spot)
+            else:
+                print(f"Invalid spot number. Please enter a number between 1 and {capacity}.")
+        
+        elif choice == 2:
+            # Vacate the specified parking spot
+            try:
+                spot = int(input("Enter spot number to vacate: "))
+            except ValueError:
+                print("Invalid input. Please enter a valid spot number.")
+                continue
+            
+            parking_lot.vacate_spot(spot)
+        
+        elif choice == 3:
+            # Display count of available parking spaces
+            print("Available Parking Spaces:", parking_lot.available_spaces())
+        
+        elif choice == 4:
+            # Display count of occupied parking spaces
+            print("Occupied Parking Spaces:", parking_lot.occupied_spaces())
+        
+        elif choice == 5:
+            # Display the current parking lot map
+            parking_lot.display_parking_map()
+        
+        elif choice == 6:
+            # Exit the system
+            print("Exiting...")
+            break
+        
+        else:
+            print("Invalid choice. Please enter a number between 1 and 6.")
+        
+        # Introduce a 1-second delay for better user experience
+        time.sleep(1)  
+
+
+# Entry point of the program
+if __name__ == "__main__":
+    main()
